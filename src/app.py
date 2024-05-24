@@ -30,30 +30,31 @@ def get_members():
     members = jackson_family.get_all_members()
     return jsonify(members), 200
 
-@app.route('/member/<int:id>', methods=['GET'])
-def get_member(id):
-    member = jackson_family.get_member(id)
+@app.route('/member/<int:member_id>', methods=['GET'])
+def get_one_member(member_id):
+    member = jackson_family.get_member(member_id)
     return jsonify(member), 200  
 
 @app.route('/member', methods=['POST'])
 def add_member():
-    body = request.get_json()
+    body_last_name = request.json.get("last_name")
+    body_name = request.json.get("first_name")
+    body_age = request.json.get("age")
+    body_id = request.json.get("id")
+    body_lucky_numbers = request.json.get("lucky_numbers")
     new_member = {
-        "id": body["id"],
-        "first_name": body["first_name"],
-        "age": body["age"],
-        "lucky_numbers": body["lucky_numbers"]
+        "id": body_id or jackson_family._generateId(),
+        "first_name": body_name,
+        "last_name": body_last_name,
+        "age": body_age,
+        "lucky_numbers": body_lucky_numbers
     }
     jackson_family.add_member(new_member)
-    response_body =  {
-        "message": "Member created",
-        "member" : new_member 
-    }
-    return jsonify(response_body), 200
+    return jsonify(None), 200
 
-@app.route('/member/<int:id>', methods=['DELETE'])
-def delete_member(id):
-    member = jackson_family.delete_member(id)
+@app.route('/member/<int:member_id>', methods=['DELETE'])
+def delete_member(member_id):
+    member = jackson_family.delete_member(member_id)
     return jsonify({"done" : True, "Member deleted": member}), 200
 
 # this only runs if `$ python src/app.py` is executed
